@@ -2,16 +2,16 @@
 @section('title', 'Edit Produk')
 @section('header', 'Edit Produk')
 @section('content')
-    <div class="max-w-lg mx-auto">
+    <div class="max-w-lg mx-auto px-0 md:px-4">
         <div class="bg-white rounded-2xl shadow-lg overflow-hidden animate-fadeIn">
-            <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-5">
+            <div class="bg-gradient-to-l from-sky-400 to-sky-500 px-6 py-5">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
                         <i class="fa-solid fa-pen-to-square text-white text-lg"></i>
                     </div>
                     <div>
                         <h2 class="text-white font-semibold text-lg">Edit Produk</h2>
-                        <p class="text-blue-100 text-xs">Perbarui informasi produk</p>
+                        <p class="text-sky-100 text-xs">Perbarui informasi produk</p>
                     </div>
                 </div>
             </div>
@@ -168,7 +168,7 @@
                             <i class="fa-solid fa-arrow-left mr-1"></i> Batal
                         </a>
                         <button type="submit"
-                            class="flex-1 bg-blue-500 hover:bg-blue-600 active:scale-95 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition duration-200 shadow-md shadow-blue-200">
+                            class="flex-1 bg-sky-400 hover:bg-sky-500 active:scale-95 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition duration-200 shadow-md shadow-sky-200">
                             <i class="fa-solid fa-floppy-disk mr-1"></i> Simpan Perubahan
                         </button>
                     </div>

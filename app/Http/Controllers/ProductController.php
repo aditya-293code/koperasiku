@@ -10,9 +10,20 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::latest()->get();
+        $search = $request->search;
+        $category = $request->category;
+        $products = Product::when($search, function ($query, $search) {
+            return $query->where('name','like','%'.$search.'%');
+        })
+
+        ->when($category, function ($query, $category) {
+            return $query->where('category', strtolower($category));
+        })
+
+        ->orderBy('id','asc')
+        ->get();
         return view('products.index', compact('products'));
     }
 
@@ -75,7 +86,7 @@ class ProductController extends Controller
             'name'     => 'required',
             'price'    => 'required|numeric',
             'stock'    => 'required|numeric',
-            'category' => 'required',
+            // 'category' => 'required',
             'image'    => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
         $data = $request->only(['name', 'price', 'stock', 'category']);

@@ -2,8 +2,8 @@
 @section('title', 'Produk')
 @section('header', 'Data Produk')
 @section('content')
-<div class="bg-white rounded-xl shadow p-5">
 
+<div class="bg-white rounded-xl shadow p-5">
 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
     <div class="flex flex-col sm:flex-row gap-3">
         <div class="relative" x-data="{ open: false }">
@@ -11,7 +11,7 @@
                 type="button"
                 @click="open = !open"
                 class="appearance-none border rounded-lg pl-4 pr-10 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 flex items-center gap-2 min-w-[150px]">
-                <span id="selectedCategory">Semua Kategori</span>
+                <span id="selectedCategory">{{ request('category') ?? 'Semua Kategori' }}</span>
                 <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs transition-transform duration-300"
                     :class="open ? 'rotate-180' : ''"></i>
             </button>
@@ -37,51 +37,61 @@
             </div>
         </div>
         <div class="relative">
-            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-            <input
-                type="text"
-                placeholder="Cari produk..."
-                class="border rounded-lg pl-9 pr-4 py-2 text-sm w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-blue-400">
+            <form method="GET" action="{{ route('products.index') }}" class="relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ request('search') }}"
+                    placeholder="Cari produk..."
+                    class="border rounded-lg pl-9 pr-4 py-2 text-sm w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-blue-400">
+            </form>
         </div>
     </div>
     <button onclick="openModal()"
-        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition w-full sm:w-auto justify-center">
+        class="bg-sky-400 hover:bg-sky-500 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition w-full sm:w-auto justify-center">
         <i class="fa-solid fa-plus"></i> Tambah Produk
     </button>
 </div>
 <div class="overflow-x-auto">
-    <table class="w-full text-sm min-w-[700px]">
+    <table class="w-full text-sm min-w-[700px] table-fixed md:table-auto border-collapse">
         <thead>
             <tr class="bg-gray-300 text-gray-700 text-center">
-                <th class="px-4 py-3 font-semibold text-left w-14">No</th>
-                <th class="px-4 py-3 font-semibold w-20">Foto</th>
-                <th class="px-4 py-3 font-semibold text-left w-48">Nama Barang</th>
-                <th class="px-4 py-3 font-semibold w-32">Kategori</th>
-                <th class="px-4 py-3 font-semibold w-32">Harga Jual</th>
-                <th class="px-4 py-3 font-semibold w-28">Stok</th>
-                <th class="px-4 py-3 font-semibold w-36">Aksi</th>
+                <th class="px-4 py-3 font-semibold">No</th>
+                <th class="px-4 py-3 font-semibold">Foto</th>
+                <th class="px-4 py-3 font-semibold">Nama Barang</th>
+                <th class="px-4 py-3 font-semibold">Kategori</th>
+                <th class="px-4 py-3 font-semibold">Harga Jual</th>
+                <th class="px-4 py-3 font-semibold">Stok</th>
+                <th class="px-4 py-3 font-semibold">Aksi</th>
             </tr>
         </thead>
         <tbody>
             @forelse ($products as $index => $product)
-                <tr class="border-b border-gray-200 hover:bg-gray-50 transition text-center">
-                    <td class="px-4 py-3 text-left text-gray-600">{{ $index + 1 }}.</td>
-                    <td class="px-4 py-3">
-                        <div class="w-12 h-12 mx-auto rounded bg-gray-100 flex items-center justify-center overflow-hidden">
-                            <img
-                                src="{{ $product->image ? asset('storage/' . $product->image) : asset('images/default.png') }}"
-                                alt="{{ $product->name }}"
-                                class="w-full h-full mix-blend-multiply">
-                        </div>
+                <tr class="border-b border-gray-200 hover:bg-gray-50 transition text-center" style="height: 64px;">
+                    <td class="px-4 text-gray-800 font-medium" style="vertical-align: middle;">{{ $index + 1 }}.</td>
+                    <td class="px-4" style="vertical-align: middle;">
+                        <img
+                            src="{{ $product->image ? asset('storage/' . $product->image) : asset('images/default.png') }}"
+                            alt="{{ $product->name }}"
+                            style="width: 44px; height: 44px; object-fit: contain; display: block; margin: 0 auto;"
+                        >
                     </td>
-                    <td class="px-4 py-3 text-left font-medium text-gray-800">{{ $product->name }}</td>
-                    <td class="px-4 py-3 text-gray-600 capitalize">{{ $product->category }}</td>
-                    <td class="px-4 py-3 text-gray-800">Rp {{ number_format($product->price, 0, ',', '.') }}</td>
-                    <td class="px-4 py-3 text-gray-600">{{ $product->stock }} PCS</td>
-                    <td class="px-4 py-3">
+                    <td class="px-4 font-medium text-gray-800 font-medium" style="vertical-align: middle;">{{ $product->name }}</td>
+                    <td class="px-4 text-gray-800 capitalize font-medium" style="vertical-align: middle;">{{ $product->category }}</td>
+                    <td class="px-4 text-gray-800 font-medium" style="vertical-align: middle;">Rp {{ number_format($product->price, 0, ',', '.') }}</td>
+                    {{-- <td class="px-4 text-gray-800 font-medium" style="vertical-align: middle;">{{ $product->stock }} PCS</td> --}}
+                    <td class="px-4 text-gray-800 font-medium" style="vertical-align: middle;">
+                        @if($product->stock == 0)
+                            <span class="text-red-500 font-semibold">Habis</span>
+                        @else
+                            {{ $product->stock }} PCS
+                        @endif
+                    </td>
+                    <td class="px-4" style="vertical-align: middle;">
                         <div class="flex items-center justify-center gap-2">
                             <a href="{{ route('products.edit', $product->id) }}"
-                                class="bg-blue-500 hover:bg-blue-600 text-white px-5 py-1.5 rounded text-xs font-medium transition">
+                                class="bg-sky-400 hover:bg-sky-500 text-white px-5 py-1.5 rounded-lg text-xs font-medium transition">
                                 Edit
                             </a>
                             <form action="{{ route('products.destroy', $product->id) }}" method="POST">
@@ -89,7 +99,7 @@
                                 @method('DELETE')
                                 <button
                                     onclick="return confirm('Hapus produk ini?')"
-                                    class="bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 rounded text-xs font-medium transition">
+                                    class="bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 rounded-lg text-xs font-medium transition">
                                     Hapus
                                 </button>
                             </form>
@@ -196,6 +206,20 @@
             preview.classList.remove('hidden');
         };
         reader.readAsDataURL(event.target.files[0]);
+    }
+
+    function selectCategory(category)
+    {
+        document.getElementById("selectedCategory").innerText = category;
+
+        let url = new URL(window.location.href);
+
+        if(category === "Semua Kategori"){
+            url.searchParams.delete("category");
+        }else{
+            url.searchParams.set("category", category);
+        }
+        window.location.href = url;
     }
 </script>
 @endpush

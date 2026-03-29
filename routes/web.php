@@ -5,6 +5,11 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\KasirController;
+use App\Http\Controllers\TransactionController;
+use App\Models\Product;
+use App\Models\Transaction;
+use Illuminate\Support\Facades\DB;
 
 Route::get('/', function () {
     return view('welcome');
@@ -14,26 +19,48 @@ Route::resource('products', ProductController::class);
 
 Route::get('/dashboard', function () {
     $role = Auth::user()->role;
-    if($role == 'admin'){
-        $totalSiswa = User::where('role', 'siswa')->count();
-        $totalKasir = User::where('role', 'kasir')->count();
-        $totalSaldo = User::where('role', 'siswa')->sum('balance');
-        $usersTerbaru = User::latest()->take(5)->get();
+    $range = request('range', '7');
+    $totalProduk = Product::count();
+    $stokMenipis = Product::where('stock','<',5)->count();
+    $penjualanHariIni = Transaction::whereDate('created_at', now())
+        ->sum('total_price');
+    $penjualanBulanIni = Transaction::whereMonth('created_at', now()->month)
+        ->sum('total_price');
+    $produkMenipis = Product::where('stock','<',5)->take(5)->get();
 
-        $labels = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
-        $data = [1000000, 2000000, 1500000, 3000000, 1800000, 2500000, 2200000];
-        return view('dashboard.admin', compact(
-            'totalSiswa',
-            'totalKasir',
-            'totalSaldo',
-            'labels',
-            'data',
-            'usersTerbaru'
-        ));
+    $chart = Transaction::select(
+            DB::raw('DATE(created_at) as tanggal'),
+            DB::raw('SUM(total_price) as total')
+        )
+        ->where('created_at', '>=', now()->subDays(6))
+        ->groupBy('tanggal')
+        ->orderBy('tanggal')
+        ->get();
 
-    }
+    $labels = $chart->pluck('tanggal')->map(function($date){
+        return \Carbon\Carbon::parse($date)->format('d M');
+    });
+
+    $data = $chart->pluck('total');
+
+    return view('dashboard.admin', compact(
+        'totalProduk',
+        'stokMenipis',
+        'penjualanHariIni',
+        'penjualanBulanIni',
+        'labels',
+        'data',
+        'produkMenipis',
+        'range'
+    ));
     return view('dashboard.siswa');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::get('/kasir', [KasirController::class, 'index'])->name('kasir.index');
+
+// Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
+
+Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
