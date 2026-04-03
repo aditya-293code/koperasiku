@@ -45,7 +45,7 @@ class ProductController extends Controller
         'price' => 'required|numeric',
         'stock' => 'required|numeric',
         // 'category' => 'required',
-        'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
+        'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048'
     ]);
         $data = $request->all();
 
@@ -87,7 +87,7 @@ class ProductController extends Controller
             'price'    => 'required|numeric',
             'stock'    => 'required|numeric',
             // 'category' => 'required',
-            'image'    => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'image'    => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
         $data = $request->only(['name', 'price', 'stock', 'category']);
 

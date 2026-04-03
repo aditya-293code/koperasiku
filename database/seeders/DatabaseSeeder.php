@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
         // Menambahkan user dengan peran "admin"
         User::create([
             'name' => 'Administrator',
-            'email' => 'admin@koperasiku.com',
+            'email' => 'admin@koperasi.com',
             'password' => Hash::make('password'), //password
             'role' => 'admin',
             'nisn' => null,// NISN tidak diperlukan untuk admin
@@ -44,7 +44,7 @@ class DatabaseSeeder extends Seeder
         // Menambahkan user dengan peran "siswa"
         User::create([
             'name' =>'Akun Siswa',
-            'email' => 'siswa@koperasiku.com',
+            'email' => 'siswa@koperasi.com',
             'password' => Hash::make('password'),
             'role' => 'siswa',
             'nisn' => '1234567890', //NISN unik

@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\KasirController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\SiswaController;
 use App\Models\Product;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\DB;
@@ -15,54 +17,73 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::resource('products', ProductController::class);
-
+// User redirect dashboard logic based on role
 Route::get('/dashboard', function () {
-    $role = Auth::user()->role;
-    $range = request('range', '7');
-    $totalProduk = Product::count();
-    $stokMenipis = Product::where('stock','<',5)->count();
-    $penjualanHariIni = Transaction::whereDate('created_at', now())
-        ->sum('total_price');
-    $penjualanBulanIni = Transaction::whereMonth('created_at', now()->month)
-        ->sum('total_price');
-    $produkMenipis = Product::where('stock','<',5)->take(5)->get();
-
-    $chart = Transaction::select(
-            DB::raw('DATE(created_at) as tanggal'),
-            DB::raw('SUM(total_price) as total')
-        )
-        ->where('created_at', '>=', now()->subDays(6))
-        ->groupBy('tanggal')
-        ->orderBy('tanggal')
-        ->get();
-
-    $labels = $chart->pluck('tanggal')->map(function($date){
-        return \Carbon\Carbon::parse($date)->format('d M');
-    });
-
-    $data = $chart->pluck('total');
-
-    return view('dashboard.admin', compact(
-        'totalProduk',
-        'stokMenipis',
-        'penjualanHariIni',
-        'penjualanBulanIni',
-        'labels',
-        'data',
-        'produkMenipis',
-        'range'
-    ));
-    return view('dashboard.siswa');
+    if (Auth::user()->role === 'admin') {
+        return redirect()->route('admin.dashboard');
+    }
+    return redirect()->route('siswa.dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::get('/kasir', [KasirController::class, 'index'])->name('kasir.index');
+// ==========================================
+// ADMIN GROUP
+// ==========================================
+Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
+    
+    Route::get('/admin/dashboard', function () {
+        $range = request('range', '7');
+        $totalProduk = Product::count();
+        $stokMenipis = Product::where('stock','<',5)->count();
+        $penjualanHariIni = Transaction::whereDate('created_at', now())->sum('total_price');
+        $penjualanBulanIni = Transaction::whereMonth('created_at', now()->month)->sum('total_price');
+        $produkMenipis = Product::where('stock','<',5)->take(5)->get();
+    
+        $chart = Transaction::select(
+                DB::raw('DATE(created_at) as tanggal'),
+                DB::raw('SUM(total_price) as total')
+            )
+            ->where('created_at', '>=', now()->subDays(6))
+            ->groupBy('tanggal')
+            ->orderBy('tanggal')
+            ->get();
+    
+        $labels = $chart->pluck('tanggal')->map(function($date){
+            return \Carbon\Carbon::parse($date)->format('d M');
+        });
+        $data = $chart->pluck('total');
+    
+        return view('dashboard.admin', compact(
+            'totalProduk',
+            'stokMenipis',
+            'penjualanHariIni',
+            'penjualanBulanIni',
+            'labels',
+            'data',
+            'produkMenipis',
+            'range'
+        ));
+    })->name('admin.dashboard');
 
-// Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
+    Route::resource('products', ProductController::class);
 
-Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
+    Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
+    Route::get('/laporan/{id}', [LaporanController::class, 'detail'])->name('laporan.detail');
+    Route::get('/laporan/{id}/print', [LaporanController::class, 'print'])->name('laporan.print');
+});
 
+// ==========================================
+// SISWA GROUP
+// ==========================================
+Route::middleware(['auth', 'verified', 'role:siswa'])->group(function () {
+    Route::get('/siswa/dashboard', [SiswaController::class, 'dashboard'])->name('siswa.dashboard');
+    Route::get('/siswa/pembelian', [SiswaController::class, 'pembelian'])->name('pembelian.index');
+    Route::post('/siswa/topup', [SiswaController::class, 'topup'])->name('siswa.topup');
+});
+
+// TRANSACTIONS (Both can access, handling logic separates behavior)
 Route::middleware('auth')->group(function () {
+    Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
+    
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
