@@ -13,7 +13,7 @@
                 onkeyup="filterProduk()"
                 class="w-full border rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
         </div>
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="productGrid">
+    <div class="grid grid-cols-2 sm:grid-cols-3  xl:grid-cols-4 gap-4" id="productGrid">
         @forelse ($products as $product)
             <div class="product-card bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition duration-200 overflow-hidden flex flex-col"
                 data-name="{{ strtolower($product->name) }}">

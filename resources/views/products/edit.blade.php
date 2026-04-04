@@ -6,9 +6,9 @@
         <div class="bg-white rounded-2xl shadow-lg overflow-hidden animate-fadeIn">
             <div class="bg-gradient-to-l from-sky-400 to-sky-500 px-6 py-5">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                    {{-- <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
                         <i class="fa-solid fa-pen-to-square text-white text-lg"></i>
-                    </div>
+                    </div> --}}
                     <div>
                         <h2 class="text-white font-semibold text-lg">Edit Produk</h2>
                         <p class="text-sky-100 text-xs">Perbarui informasi produk</p>
@@ -24,11 +24,11 @@
                             Nama Produk
                         </label>
                         <div class="relative">
-                            <i
-                                class="fa-solid fa-tag absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-400 transition text-sm"></i>
+                            {{-- <i
+                                class="fa-solid fa-tag absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-400 transition text-sm"></i> --}}
                             <input type="text" name="name" value="{{ old('name', $product->name) }}"
                                 placeholder="Nama produk..."
-                                class="w-full border border-gray-200 rounded-xl pl-9 pr-4 py-2.5 text-sm
+                                class="w-full border border-gray-200 rounded-xl pl-4 pr-4 py-2.5 text-sm
                             focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent
                             transition duration-200 hover:border-blue-300">
                         </div>
@@ -61,11 +61,11 @@
                                 Stok
                             </label>
                             <div class="relative">
-                                <i
-                                    class="fa-solid fa-cubes absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-400 transition text-sm"></i>
+                                {{-- <i
+                                    class="fa-solid fa-cubes absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-400 transition text-sm"></i> --}}
                                 <input type="number" name="stock" value="{{ old('stock', $product->stock) }}"
                                     placeholder="0"
-                                    class="w-full border border-gray-200 rounded-xl pl-9 pr-4 py-2.5 text-sm
+                                    class="w-full border border-gray-200 rounded-xl pl-4 pr-4 py-2.5 text-sm
                                 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent
                                 transition duration-200 hover:border-blue-300">
                             </div>
@@ -80,11 +80,11 @@
                         </label>
                         <div class="relative" x-data="{ open: false, selected: '{{ old('category', $product->category) }}' }">
                             <button type="button" @click="open = !open"
-                                class="w-full flex items-center border border-gray-200 rounded-xl pl-9 pr-4 py-2.5 text-sm
+                                class="w-full flex items-center border border-gray-200 rounded-xl pl-4 pr-4 py-2.5 text-sm
                                     bg-white hover:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400
                                     transition duration-200">
-                                <i class="fa-solid fa-layer-group absolute left-3 text-gray-300 text-sm"
-                                    :class="open ? 'text-blue-400' : 'text-gray-300'"></i>
+                                {{-- <i class="fa-solid fa-layer-group absolute left-3 text-gray-300 text-sm"
+                                    :class="open ? 'text-blue-400' : 'text-gray-300'"></i> --}}
                                 <span
                                     x-text="selected ? selected.charAt(0).toUpperCase() + selected.slice(1) : 'Pilih Kategori'"
                                     :class="selected ? 'text-gray-700' : 'text-gray-400'">
@@ -145,7 +145,7 @@
                         <label for="imageInput"
                             class="flex items-center gap-2 border-2 border-dashed border-gray-200 rounded-xl px-4 py-3
                         cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition duration-200 group">
-                            <i class="fa-solid fa-upload text-gray-300 group-hover:text-blue-400 transition"></i>
+                            {{-- <i class="fa-solid fa-upload text-gray-300 group-hover:text-blue-400 transition"></i> --}}
                             <span class="text-sm text-gray-400 group-hover:text-blue-500 transition">
                                 Pilih gambar baru...
                             </span>

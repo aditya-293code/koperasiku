@@ -79,7 +79,7 @@
                         <i class="fa-solid fa-cash-register w-4"></i>
                         Kasir
                     </a>
-                    <a href="#"
+                    <a href="{{ route('laporan.index') }}"
                         class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm
                         transition-all duration-200 transform hover:translate-x-1 active:scale-95
                         hover:shadow-[0_6px_12px_rgba(27,168,240,0.4)]
