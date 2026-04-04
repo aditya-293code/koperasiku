@@ -1,163 +1,128 @@
 <?php
 
 namespace App\Http\Controllers;
+
+// use App\Models\Transaction;
+use App\Models\TransactionItem;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Models\Transaction;
-use App\Models\TransactionItem;
+// use App\Models\TransactionItem;
+// use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class LaporanController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
-        $today = now()->toDateString();
-        $range = $request->range ?? 7;
+        // Default: bulan ini
+        $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->format('Y-m-d'));
+        $endDate   = $request->input('end_date',   Carbon::now()->endOfMonth()->format('Y-m-d'));
+        $search    = $request->input('search', '');
 
-        // STAT CARDS
-        $transaksiHariIni    = Transaction::whereDate('created_at', $today)->count();
-        $pendapatanHariIni   = Transaction::whereDate('created_at', $today)->sum('total_price');
-        $produkTerjualHariIni = TransactionItem::whereHas('transaction', function ($q) use ($today) {
-            $q->whereDate('created_at', $today);
-        })->sum('qty');
+        $start = Carbon::parse($startDate)->startOfDay();
+        $end   = Carbon::parse($endDate)->endOfDay();
 
-        // FILTER TRANSAKSI
-        $query = Transaction::with('items.product', 'user');
-        if ($request->start && $request->end) {
-            $query->whereBetween('created_at', [
-                $request->start . ' 00:00:00',
-                $request->end . ' 23:59:59'
-            ]);
-        }
-        $transactions = $query->latest()->get();
-        $total = $transactions->sum('total_price');
+        // Ambil transaksi dengan filter tanggal
+        $query = Transaction::with(['user', 'items.product'])
+            ->whereBetween('created_at', [$start, $end]);
 
-        // GRAFIK
-        $labels    = [];
-        $chartData = [];
-        for ($i = $range - 1; $i >= 0; $i--) {
-            $date = Carbon::now()->subDays($i);
-            $labels[]    = $date->format('d M');
-            $chartData[] = Transaction::whereDate('created_at', $date->toDateString())->sum('total_price');
+        if ($search) {
+            $query->whereHas('user', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%");
+            });
         }
 
-        // PRODUK TERLARIS
-        $produkTerlaris = TransactionItem::with('product')
-            ->selectRaw('product_id, SUM(qty) as total_qty, SUM(qty * price) as total_revenue')
-            ->when($request->start && $request->end, function ($q) use ($request) {
-                $q->whereHas('transaction', function ($q2) use ($request) {
-                    $q2->whereBetween('created_at', [
-                        $request->start . ' 00:00:00',
-                        $request->end . ' 23:59:59'
-                    ]);
-                });
+        $transactions = $query->latest()->paginate(15)->withQueryString();
+
+        // Ringkasan statistik
+        $totalPendapatan = Transaction::whereBetween('created_at', [$start, $end])->sum('total_price');
+        $totalTransaksi  = Transaction::whereBetween('created_at', [$start, $end])->count();
+        $rataRata        = $totalTransaksi > 0 ? round($totalPendapatan / $totalTransaksi) : 0;
+
+        // Produk terlaris di periode ini
+        $produkTerlaris = TransactionItem::select('product_id', DB::raw('SUM(qty) as total_qty'), DB::raw('SUM(subtotal) as total_revenue'))
+            ->whereHas('transaction', function ($q) use ($start, $end) {
+                $q->whereBetween('created_at', [$start, $end]);
             })
+            ->with('product')
             ->groupBy('product_id')
             ->orderByDesc('total_qty')
-            ->limit(7)
+            ->take(5)
             ->get();
 
-        // EXPORT
-        if ($request->export === 'pdf') {
-            return $this->exportPDF($transactions);
-        }
-        if ($request->export === 'excel') {
-            return $this->exportExcel($transactions);
-        }
+        // Data chart harian
+        $chartData = Transaction::select(
+                DB::raw('DATE(created_at) as tanggal'),
+                DB::raw('SUM(total_price) as total'),
+                DB::raw('COUNT(*) as jumlah')
+            )
+            ->whereBetween('created_at', [$start, $end])
+            ->groupBy('tanggal')
+            ->orderBy('tanggal')
+            ->get();
+
+        $chartLabels = $chartData->pluck('tanggal')->map(fn($d) => Carbon::parse($d)->format('d M'));
+        $chartTotals = $chartData->pluck('total');
+        $chartCount  = $chartData->pluck('jumlah');
 
         return view('laporan.index', compact(
-            'transaksiHariIni',
-            'pendapatanHariIni',
-            'produkTerjualHariIni',
             'transactions',
-            'total',
-            'labels',
-            'chartData',
+            'totalPendapatan',
+            'totalTransaksi',
+            'rataRata',
             'produkTerlaris',
-            'range'
+            'chartLabels',
+            'chartTotals',
+            'chartCount',
+            'startDate',
+            'endDate',
+            'search'
         ));
     }
 
-    private function exportPDF($transactions)
+    public function detail($id)
     {
-        $html = view('laporan.export-pdf', compact('transactions'))->render();
-        $filename = 'laporan-' . now()->format('Y-m-d') . '.html';
-
-        return response($html)
-            ->header('Content-Type', 'text/html')
-            ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
+        $transaction = Transaction::with(['user', 'items.product'])->findOrFail($id);
+        return view('laporan.detail', compact('transaction'));
     }
 
-    private function exportExcel($transactions)
+    public function print($id)
     {
-        $filename = 'laporan-' . now()->format('Y-m-d') . '.csv';
-        $headers = [
-            'Content-Type'        => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-        ];
-
-        $callback = function () use ($transactions) {
-            $file = fopen('php://output', 'w');
-            fputcsv($file, ['No', 'Tanggal', 'Kasir', 'Total']);
-            foreach ($transactions as $i => $trx) {
-                fputcsv($file, [
-                    $i + 1,
-                    $trx->created_at->format('d-m-Y H:i'),
-                    $trx->user->name ?? '-',
-                    $trx->total_price,
-                ]);
-            }
-            fclose($file);
-        };
-
-        return response()->stream($callback, 200, $headers);
+        $transaction = Transaction::with(['user', 'items.product'])->findOrFail($id);
+        return view('laporan.print', compact('transaction'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         //
     }
 
-    /**
-     * Display the specified resource.
-     */
+
     public function show(string $id)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+
     public function edit(string $id)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+
     public function update(Request $request, string $id)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+
     public function destroy(string $id)
     {
         //

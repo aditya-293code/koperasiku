@@ -8,7 +8,6 @@ use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\KasirController;
 use App\Http\Controllers\TransactionController;
-use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\SiswaController;
 use App\Models\Product;
 use App\Models\Transaction;
@@ -30,7 +29,7 @@ Route::get('/dashboard', function () {
 // ADMIN GROUP
 // ==========================================
 Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
-    
+
     Route::get('/admin/dashboard', function () {
         $range = request('range', '7');
         $totalProduk = Product::count();
@@ -38,7 +37,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
         $penjualanHariIni = Transaction::whereDate('created_at', now())->sum('total_price');
         $penjualanBulanIni = Transaction::whereMonth('created_at', now()->month)->sum('total_price');
         $produkMenipis = Product::where('stock','<',5)->take(5)->get();
-    
+
         $chart = Transaction::select(
                 DB::raw('DATE(created_at) as tanggal'),
                 DB::raw('SUM(total_price) as total')
@@ -47,12 +46,12 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
             ->groupBy('tanggal')
             ->orderBy('tanggal')
             ->get();
-    
+
         $labels = $chart->pluck('tanggal')->map(function($date){
             return \Carbon\Carbon::parse($date)->format('d M');
         });
         $data = $chart->pluck('total');
-    
+
         return view('dashboard.admin', compact(
             'totalProduk',
             'stokMenipis',
@@ -65,11 +64,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
         ));
     })->name('admin.dashboard');
 
-<<<<<<< HEAD
-Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
-=======
     Route::resource('products', ProductController::class);
->>>>>>> teman/main
 
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
     Route::get('/laporan/{id}', [LaporanController::class, 'detail'])->name('laporan.detail');
@@ -88,7 +83,7 @@ Route::middleware(['auth', 'verified', 'role:siswa'])->group(function () {
 // TRANSACTIONS (Both can access, handling logic separates behavior)
 Route::middleware('auth')->group(function () {
     Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
-    
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

@@ -3,7 +3,6 @@
 @section('header', 'Data Produk')
 @section('content')
 
-{{-- HEADER --}}
 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
     <div>
         <h2 class="text-lg font-bold text-gray-800">Daftar Produk</h2>
@@ -16,12 +15,8 @@
         <i class="fa-solid fa-plus text-xs"></i> Tambah Produk
     </button>
 </div>
-
-{{-- FILTER --}}
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4">
     <div class="flex flex-col sm:flex-row gap-3 sm:items-center">
-
-        {{-- DROPDOWN KATEGORI --}}
         <div class="relative" x-data="{ open: false }">
             <button
                 type="button"
@@ -59,8 +54,6 @@
                 @endforeach
             </div>
         </div>
-
-        {{-- SEARCH --}}
         <div class="relative flex-1 sm:max-w-xs">
             <form method="GET" action="{{ route('products.index') }}">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2
@@ -74,15 +67,11 @@
                     hover:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400 transition">
             </form>
         </div>
-
-        {{-- TOTAL PRODUK --}}
         <div class="sm:ml-auto flex items-center gap-2 text-semibold text-gray-400">
             <span>{{ $products->count() }} produk</span>
         </div>
     </div>
 </div>
-
-{{-- TABLE --}}
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
     <div class="overflow-x-auto">
         <table class="w-full text-sm">
@@ -182,15 +171,12 @@
     </div>
 </div>
 
-{{-- MODAL TAMBAH PRODUK --}}
 <div id="modalProduk"
     class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden items-center justify-center z-50 px-4"
     onclick="closeModal(event)">
     <div id="modalContent"
         class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6
         transform scale-90 opacity-0 transition duration-200 max-h-[90vh] overflow-y-auto">
-
-        {{-- HEADER MODAL --}}
         <div class="flex items-center justify-between mb-5">
             <div>
                 <h2 class="text-base font-bold text-gray-800">Tambah Produk</h2>

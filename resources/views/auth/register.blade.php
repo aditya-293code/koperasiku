@@ -1,7 +1,7 @@
 <x-guest-layout>
             <div class="text-center mb-6">
-                <h2 class="text-3xl font-bold text-blue-600">
-                    🏪 KoperasiKU
+                <h2 class="text-3xl font-bold">
+                    🏪 KOPERASIKU
                 </h2>
                 <p class="text-gray-500 text-sm mt-2">
                     Buat Akun Baru
@@ -31,7 +31,7 @@
                         name="nisn"
                         :value="old('nisn')" />
                     <x-input-error :messages="$errors->get('nisn')" class="mt-2" />
-                    
+
                 </div>
 
                 <div class="mt-4">
