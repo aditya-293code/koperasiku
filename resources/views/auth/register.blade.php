@@ -31,9 +31,7 @@
                         name="nisn"
                         :value="old('nisn')" />
                     <x-input-error :messages="$errors->get('nisn')" class="mt-2" />
-                    <p class="text-xs text-gray-500 mt-1">
-                        Kosongkan jika Anda Admin / Kasir
-                    </p>
+                    
                 </div>
 
                 <div class="mt-4">

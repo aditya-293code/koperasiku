@@ -8,6 +8,8 @@ use App\Models\TransactionItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use App\Models\User;
 
 class TransactionController extends Controller
 {
@@ -40,6 +42,20 @@ class TransactionController extends Controller
         ]);
 
         try {
+            DB::beginTransaction();
+
+            $user = User::findOrFail(Auth::id());
+
+            // Jika user adalah siswa, cek dan potong saldo
+            if ($user->role === 'siswa') {
+                if ($user->balance < $request->total_price) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => "Saldo tidak mencukupi! Saldo Anda: Rp " . number_format($user->balance, 0, ',', '.')
+                    ], 422);
+                }
+            }
+
             // Cek stok semua item dulu
             foreach ($request->items as $item) {
                 $product = Product::findOrFail($item['id']);
@@ -53,7 +69,7 @@ class TransactionController extends Controller
 
             // Buat transaksi SEKALI di luar loop
             $transaction = Transaction::create([
-                'user_id'     => Auth::id(),
+                'user_id'     => $user->id,
                 'total_price' => $request->total_price,
             ]);
 
@@ -72,14 +88,24 @@ class TransactionController extends Controller
                 $product->decrement('stock', $item['qty']);
             }
 
+            // Potong balance jika role siswa
+            if ($user->role === 'siswa') {
+                $user->balance -= $request->total_price;
+                $user->save();
+            }
+
+            DB::commit();
+
             return response()->json([
                 'success'        => true,
                 'message'        => 'Transaksi berhasil!',
                 'transaction_id' => $transaction->id,
                 'total_price'    => $request->total_price,
+                'current_balance'=> $user->balance // kirim balik balance
             ]);
 
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Gagal membuat transaksi', [
                 'error_message' => $e->getMessage(),
             ]);
