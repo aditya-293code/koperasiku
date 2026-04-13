@@ -9,6 +9,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\KasirController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\SiswaController;
+use App\Http\Controllers\RiwayatController;
 use App\Models\Product;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\DB;
@@ -69,20 +70,21 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
     Route::get('/laporan/{id}', [LaporanController::class, 'detail'])->name('laporan.detail');
     Route::get('/laporan/{id}/print', [LaporanController::class, 'print'])->name('laporan.print');
-});
+    });
 
-// ==========================================
-// SISWA GROUP
-// ==========================================
-Route::middleware(['auth', 'verified', 'role:siswa'])->group(function () {
-    Route::get('/siswa/dashboard', [SiswaController::class, 'dashboard'])->name('siswa.dashboard');
-    Route::get('/siswa/pembelian', [SiswaController::class, 'pembelian'])->name('pembelian.index');
-    Route::post('/siswa/topup', [SiswaController::class, 'topup'])->name('siswa.topup');
-});
+    // ==========================================
+    // SISWA GROUP
+    // ==========================================
+    Route::middleware(['auth', 'verified', 'role:siswa'])->group(function () {
+        Route::get('/siswa/dashboard', [SiswaController::class, 'dashboard'])->name('siswa.dashboard');
+        Route::get('/siswa/pembelian', [SiswaController::class, 'pembelian'])->name('pembelian.index');
+        Route::post('/siswa/topup', [SiswaController::class, 'topup'])->name('siswa.topup');
+        });
 
-// TRANSACTIONS (Both can access, handling logic separates behavior)
-Route::middleware('auth')->group(function () {
-    Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
+        // TRANSACTIONS (Both can access, handling logic separates behavior)
+        Route::middleware('auth')->group(function () {
+            Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
+            Route::resource('riwayat', RiwayatController::class);
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
