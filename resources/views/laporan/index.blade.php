@@ -1,11 +1,8 @@
 @extends('layouts.master')
 @section('title', 'Laporan Penjualan')
 @section('header', 'Laporan Penjualan')
-
 @section('content')
 <div class="space-y-6">
-
-    {{-- FILTER BAR --}}
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
         <form method="GET" action="{{ route('laporan.index') }}" class="flex flex-wrap gap-3 items-end">
             <div class="flex flex-col gap-1">

@@ -225,14 +225,47 @@
                     <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide block mb-1.5">
                         Kategori
                     </label>
-                    <select name="category"
-                        class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm
-                        focus:outline-none focus:ring-2 focus:ring-sky-400 hover:border-sky-300 transition bg-white">
-                        <option value="">Pilih kategori</option>
-                        <option value="jajanan">Jajanan</option>
-                        <option value="minuman">Minuman</option>
-                        <option value="atk">ATK</option>
-                    </select>
+                    <div class="relative" x-data="{ open: false, selected: '' }">
+                        <button
+                            type="button"
+                            @click="open = !open"
+                            class="flex items-center gap-2 border border-gray-200 rounded-xl pl-4 pr-10 py-2.5
+                            text-sm bg-white hover:border-sky-400 focus:outline-none focus:ring-2
+                            focus:ring-sky-400 transition w-full">
+                            {{-- <i class="fa-solid fa-layer-group text-gray-300 text-xs"></i> --}}
+                            <span :class="selected ? 'text-gray-700' : 'text-gray-400'"
+                                x-text="selected ? selected.charAt(0).toUpperCase() + selected.slice(1) : 'Pilih kategori'">
+                            </span>
+                            <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2
+                                text-gray-300 text-xs transition-transform duration-300"
+                                :class="open ? 'rotate-180' : ''"></i>
+                        </button>
+                        <input type="hidden" name="category" :value="selected">
+                        <div
+                            x-show="open"
+                            x-transition:enter="transition ease-out duration-200"
+                            x-transition:enter-start="opacity-0 scale-95 -translate-y-2"
+                            x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                            x-transition:leave="transition ease-in duration-150"
+                            x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                            x-transition:leave-end="opacity-0 scale-95 -translate-y-2"
+                            @click.outside="open = false"
+                            class="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100
+                            rounded-xl shadow-lg z-20 overflow-hidden origin-top">
+                            @foreach(['jajanan', 'minuman', 'atk'] as $cat)
+                                <button
+                                    type="button"
+                                    @click="selected = '{{ $cat }}'; open = false"
+                                    class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-left
+                                    hover:bg-sky-50 hover:text-sky-600 transition"
+                                    :class="selected === '{{ $cat }}' ? 'text-sky-600 bg-sky-50 font-medium' : 'text-gray-600'">
+                                    <i class="fa-solid fa-check text-xs text-sky-400 transition"
+                                        :class="selected === '{{ $cat }}' ? 'opacity-100' : 'opacity-0'"></i>
+                                    {{ ucfirst($cat) }}
+                                </button>
+                            @endforeach
+                        </div>
+                    </div>
                 </div>
                 <div>
                     <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide block mb-1.5">
@@ -257,7 +290,7 @@
 
             <div class="flex gap-3 mt-6 pt-4 border-t border-gray-100">
                 <button type="button" onclick="closeModalBtn()"
-                    class="flex-1 border border-gray-200 hover:bg-gray-50 text-gray-600 py-2.5
+                    class="flex-1 border bg-red-500 border-red-500 hover:bg-red-600 text-white py-2.5
                     rounded-xl text-sm font-medium transition">
                     Batal
                 </button>

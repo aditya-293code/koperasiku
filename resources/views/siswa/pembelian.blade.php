@@ -48,7 +48,7 @@
             {{ $products->links() }}
         </div>
     </div>
-    
+
     <div class="w-full lg:w-72 flex-shrink-0 flex flex-col bg-white rounded-xl shadow border border-gray-200" style="max-height: calc(100vh - 120px);">
         <div class="flex flex-col px-4 py-3 border-b bg-slate-50 rounded-t-xl">
             <div class="flex items-center justify-between mb-1">
@@ -66,14 +66,14 @@
                 <span class="font-bold text-sky-600">Rp {{ number_format(Auth::user()->balance, 0, ',', '.') }}</span>
             </div>
         </div>
-        
+
         <div class="flex-1 overflow-y-auto px-3 py-2" id="keranjangList">
             <div id="keranjangKosong" class="flex flex-col items-center justify-center h-40 text-gray-300">
                 <i class="fa-solid fa-cart-shopping text-4xl mb-2"></i>
                 <p class="text-xs">Keranjang kosong</p>
             </div>
         </div>
-        
+
         <div class="border-t px-4 py-4 bg-slate-50 rounded-b-xl">
             <div class="flex justify-between items-center mb-3">
                 <span class="text-sm text-gray-600 font-semibold">Total Diminta</span>
@@ -86,7 +86,7 @@
             </button>
         </div>
     </div>
-    
+
     <!-- Modal Konfirmasi / Sukses -->
     <div id="modalBayar" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 items-center justify-center transition-all duration-300 opacity-0 flex">
         <div class="bg-white w-[400px] rounded-2xl p-6 shadow-xl transform scale-95 transition-all duration-300" id="modalCard">
@@ -100,17 +100,17 @@
                         <i class="fa-solid fa-xmark text-lg"></i>
                     </button>
                 </div>
-                
+
                 <div class="bg-slate-50 rounded-xl p-4 mb-4 border border-slate-100 flex justify-between items-center">
                     <span class="text-sm font-semibold text-slate-500">Total Tagihan</span>
                     <span id="modalTotal" class="text-xl font-bold text-sky-600">Rp 0</span>
                 </div>
-                
+
                 <div class="flex justify-between items-center text-sm mb-6 px-1">
                     <span class="text-slate-500">Sisa Saldo Setelah Beli:</span>
                     <span id="sisaSaldo" class="font-bold text-slate-700">Rp 0</span>
                 </div>
-                
+
                 <button
                     onclick="konfirmasiBayar()"
                     id="btnProcessConfirm"
@@ -118,22 +118,20 @@
                     Proses Sekarang
                 </button>
             </div>
-            
-            <!-- State SUKSES -->
             <div id="stateSukses" class="hidden">
-                 <div class="flex flex-col items-center pb-2">
+                <div class="flex flex-col items-center pb-2">
                     <div class="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mb-4 animate-bounce">
                         <i class="fa-solid fa-check text-emerald-500 text-3xl"></i>
                     </div>
                     <h2 class="text-xl font-bold text-slate-800">Pembelian Berhasil!</h2>
                     <p class="text-sm text-slate-500 mt-1">Saldo Anda telah dipotong</p>
                 </div>
-                
+
                 <div class="bg-slate-50 rounded-xl p-4 my-4 text-center border border-slate-100">
                     <p class="text-xs text-slate-500 mb-1">Total</p>
                     <p id="totalSuksesInfo" class="text-2xl font-bold text-sky-600">Rp 0</p>
                 </div>
-                
+
                 <div class="flex border-t pt-4">
                     <button onclick="tutupLanjut()"
                         class="w-full py-3 text-sm font-bold bg-slate-800 hover:bg-slate-900 shadow-md text-white transition rounded-xl">
@@ -141,7 +139,7 @@
                     </button>
                 </div>
             </div>
-            
+
         </div>
     </div>
 
@@ -168,7 +166,7 @@
         }
         renderKeranjang();
     }
-    
+
     function ubahQty(id, delta) {
         const item = keranjang.find(i => i.id === id);
         if (!item) return;
@@ -181,7 +179,7 @@
         }
         renderKeranjang();
     }
-    
+
     function hapusSemua() {
         if (keranjang.length === 0) return;
         if (confirm('Hapus semua item dari keranjang?')) {
@@ -189,12 +187,12 @@
             renderKeranjang();
         }
     }
-    
+
     function renderKeranjang() {
         const list = document.getElementById('keranjangList');
         currentTotal = keranjang.reduce((sum, i) => sum + i.harga * i.qty, 0);
         document.getElementById('totalHarga').textContent = 'Rp ' + currentTotal.toLocaleString('id-ID');
-        
+
         const btnBayar = document.getElementById('btnBayar');
         if(currentTotal > userBalance) {
             btnBayar.classList.remove('bg-sky-500', 'hover:bg-sky-600');
@@ -214,7 +212,7 @@
                 </div>`;
             return;
         }
-        
+
         list.innerHTML = keranjang.map(item => `
             <div class="flex items-center gap-2 py-2 border-b border-gray-100 last:border-0">
                 <div class="w-10 h-10 rounded-lg bg-white border border-slate-100 flex items-center justify-center overflow-hidden flex-shrink-0">
@@ -250,14 +248,14 @@
             alert('Saldo Anda tidak cukup! Harap isi saldo terlebih dahulu.');
             return;
         }
-        
+
         document.getElementById('modalTotal').textContent = 'Rp ' + currentTotal.toLocaleString('id-ID');
         document.getElementById('totalSuksesInfo').textContent = 'Rp ' + currentTotal.toLocaleString('id-ID');
         document.getElementById('sisaSaldo').textContent = 'Rp ' + (userBalance - currentTotal).toLocaleString('id-ID');
-        
+
         document.getElementById('stateKonfirmasi').classList.remove('hidden');
         document.getElementById('stateSukses').classList.add('hidden');
-        
+
         const modal = document.getElementById('modalBayar');
         modal.classList.remove('hidden');
         setTimeout(() => {
@@ -272,7 +270,7 @@
         document.getElementById('modalCard').classList.add('scale-95');
         setTimeout(() => modal.classList.add('hidden'), 300);
     }
-    
+
     function tutupLanjut() {
         window.location.reload();
     }
@@ -282,7 +280,7 @@
         const btn = document.getElementById('btnProcessConfirm');
         btn.disabled = true;
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses...';
-        
+
         fetch('{{ route('transactions.store') }}', {
             method: 'POST',
             headers: {

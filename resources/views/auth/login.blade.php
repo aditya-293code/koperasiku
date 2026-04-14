@@ -93,7 +93,7 @@
 
                 <div class="mt-6">
                     <button type="submit"
-                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition duration-200">
+                        class="w-full bg-sky-400 hover:bg-sky-500 text-white font-semibold py-2 rounded-lg transition duration-200">
                         Masuk
                     </button>
                 </div>
