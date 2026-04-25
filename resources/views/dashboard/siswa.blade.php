@@ -32,10 +32,6 @@
                 </div>
             </div>
         </div>
-        
-        <button @click="showTopup = true" class="w-full sm:w-auto px-6 py-3 bg-white text-indigo-600 font-bold rounded-xl shadow-sm hover:shadow-md hover:bg-slate-50 transition transform hover:-translate-y-0.5 active:scale-95 flex items-center justify-center gap-2">
-            <i class="fa-solid fa-plus-circle"></i> Top Up Saldo
-        </button>
     </div>
 
     {{-- MAIN CONTENT --}}
@@ -140,55 +136,7 @@
         </div>
     </div>
 
-    {{-- MODAL TOP UP --}}
-    <div x-show="showTopup" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center">
-        <div x-show="showTopup" x-transition.opacity class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" @click="showTopup = false"></div>
-        
-        <div x-show="showTopup" 
-            x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-            x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-            x-transition:leave="transition ease-in duration-200"
-            x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-            x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-            class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
-            
-            <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                <h3 class="font-bold text-slate-800 flex items-center gap-2">
-                    <i class="fa-solid fa-plus-circle text-sky-500"></i> Isi Saldo
-                </h3>
-                <button @click="showTopup = false" class="text-slate-400 hover:text-red-500 transition">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-            
-            <form action="{{ route('siswa.topup') }}" method="POST" class="p-6">
-                @csrf
-                <div class="mb-5">
-                    <label class="block text-sm font-semibold text-slate-600 mb-2">Pilih Nominal Top Up</label>
-                    <div class="grid grid-cols-2 gap-3 mb-4">
-                        <button type="button" @click="topupAmount = 10000" :class="topupAmount == 10000 ? 'bg-sky-50 border-sky-500 text-sky-700' : 'bg-white border-slate-200 text-slate-600 hover:border-sky-300'" class="border rounded-xl py-2 font-semibold text-sm transition">Rp 10.000</button>
-                        <button type="button" @click="topupAmount = 20000" :class="topupAmount == 20000 ? 'bg-sky-50 border-sky-500 text-sky-700' : 'bg-white border-slate-200 text-slate-600 hover:border-sky-300'" class="border rounded-xl py-2 font-semibold text-sm transition">Rp 20.000</button>
-                        <button type="button" @click="topupAmount = 50000" :class="topupAmount == 50000 ? 'bg-sky-50 border-sky-500 text-sky-700' : 'bg-white border-slate-200 text-slate-600 hover:border-sky-300'" class="border rounded-xl py-2 font-semibold text-sm transition">Rp 50.000</button>
-                        <button type="button" @click="topupAmount = null" :class="topupAmount != 10000 && topupAmount != 20000 && topupAmount != 50000 && topupAmount != null ? 'bg-sky-50 border-sky-500 text-sky-700' : 'bg-white border-slate-200 text-slate-600 hover:border-sky-300'" class="border rounded-xl py-2 font-semibold text-sm transition">Nominal Lain</button>
-                    </div>
-                    
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-                            <span class="text-slate-500 font-semibold">Rp</span>
-                        </div>
-                        <input type="number" name="amount" x-model="topupAmount" required min="1000" step="1000" placeholder="0" class="bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-sky-500 focus:border-sky-500 block w-full pl-12 p-3 font-semibold transition" >
-                    </div>
-                    <p class="text-[11px] text-slate-400 mt-2">* Minimal top up Rp 1.000</p>
-                </div>
-                
-                <div class="flex items-center gap-3 pt-2">
-                    <button type="button" @click="showTopup = false" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl transition">Batal</button>
-                    <button type="submit" class="flex-1 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-semibold rounded-xl transition shadow-lg shadow-sky-500/30">Bayar</button>
-                </div>
-            </form>
-        </div>
-    </div>
+
 
 </div>
 @endsection
@@ -200,8 +148,6 @@
             balance: initialBalance,
             cart: [],
             isLoading: false,
-            showTopup: false,
-            topupAmount: 10000,
             
             get totalPrice() {
                 return this.cart.reduce((total, item) => total + (item.price * item.qty), 0);
@@ -265,10 +211,7 @@
                     const data = await response.json();
                     
                     if (data.success) {
-                        alert('Pembelian Berhasil!');
-                        this.balance = data.current_balance; // update balance di UI
-                        this.cart = [];
-                        window.location.reload(); // reload agar stok produk berkurang di UI
+                        window.location.href = data.receipt_url;
                     } else {
                         alert(data.message || 'Terjadi kesalahan');
                     }

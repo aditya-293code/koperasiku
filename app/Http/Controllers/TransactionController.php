@@ -101,7 +101,8 @@ class TransactionController extends Controller
                 'message'        => 'Transaksi berhasil!',
                 'transaction_id' => $transaction->id,
                 'total_price'    => $request->total_price,
-                'current_balance'=> $user->balance // kirim balik balance
+                'current_balance'=> $user->balance, // kirim balik balance
+                'receipt_url'    => route('transactions.receipt', $transaction->id)
             ]);
 
         } catch (\Exception $e) {
@@ -147,5 +148,21 @@ class TransactionController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    /**
+     * Display the receipt for the specified transaction.
+     */
+    public function receipt(string $id)
+    {
+        // Find transaction and its items
+        $transaction = Transaction::with(['items.product', 'user'])->findOrFail($id);
+
+        // Ensure user can only see their own receipt (or if admin, maybe can see all, but here we secure for user)
+        if (Auth::user()->role === 'siswa' && $transaction->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized access to this receipt.');
+        }
+
+        return view('transactions.receipt', compact('transaction'));
     }
 }
