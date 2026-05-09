@@ -11,6 +11,7 @@ use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\TopupController;
 use App\Http\Controllers\RiwayatController;
+use App\Http\Controllers\AdminSiswaController;
 use App\Models\Product;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\DB;
@@ -74,6 +75,8 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     
     Route::get('/topup', [TopupController::class, 'index'])->name('admin.topup.index');
     Route::post('/topup', [TopupController::class, 'store'])->name('admin.topup.store');
+    
+    Route::resource('siswa', AdminSiswaController::class)->names('admin.siswa')->except(['show']);
     });
 
     // ==========================================
