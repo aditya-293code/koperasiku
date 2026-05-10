@@ -88,6 +88,14 @@
                 @if(Auth::user()->role === 'admin')
                 <div class="space-y-3" style="margin-top: 1.5rem;">
                     <p class="text-xs text-gray-400 uppercase mb-2 font-medium">Manajemen</p>
+                    <a href="{{ route('admin.siswa.index') }}"
+                        class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm
+                        transition-all duration-200 transform hover:translate-x-1 active:scale-95
+                        hover:shadow-[0_6px_12px_rgba(27,168,240,0.4)]
+                        {{ request()->routeIs('admin.siswa.*') ? 'bg-sky-400 text-white shadow' : 'text-gray-600 hover:bg-gray-100' }}">
+                        <i class="fa-solid fa-users w-4"></i>
+                        Siswa
+                    </a>
                     <a href="{{ route('products.index') }}"
                         class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm
                         transition-all duration-200 transform hover:translate-x-1 active:scale-95
