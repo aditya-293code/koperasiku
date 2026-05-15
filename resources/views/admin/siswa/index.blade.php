@@ -36,7 +36,7 @@
                         <td class="px-5 py-4 text-center text-gray-500 text-sm align-middle">
                             {{ $index + 1 }}
                         </td>
-                        
+
                         <!-- Nama Siswa -->
                         <td class="px-5 py-4 text-left align-middle">
                             <p class="font-semibold text-gray-800">{{ $siswa->name }}</p>
