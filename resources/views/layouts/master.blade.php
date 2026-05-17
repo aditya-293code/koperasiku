@@ -38,11 +38,9 @@
 </head>
 <body class="bg-gray-100">
     <div class="flex min-h-screen">
-
         <div id="sidebar-overlay" onclick="closeSidebar()"></div>
-
-        <aside id="sidebar" class="w-64 bg-white border-r hidden md:flex flex-col flex-shrink-0">
-            <div class="h-16 flex items-center justify-between px-6 border-b">
+        <aside id="sidebar" class="w-64 bg-white border-r hidden md:flex flex-col flex-shrink-0 fixed top-0 left-0 h-screen z-40">
+            <div class="h-16 flex items-center gap-4 px-4 border-b">
                 <div class="flex items-center gap-3">
                     <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
                         <path d="M12 2L2 7l10 5 10-5-10-5z" fill="#0EA5E9" opacity="0.9"/>
@@ -144,7 +142,7 @@
             </nav>
         </aside>
 
-        <div class="flex-1 flex flex-col min-w-0">
+        <div class="flex-1 flex flex-col min-w-0 md:ml-64">
             <header class="bg-white h-16 border-b px-4 md:px-6 flex items-center justify-between sticky top-0 z-30">
                 <div class="flex items-center gap-3">
                     <button onclick="openSidebar()" class="md:hidden text-gray-500 hover:text-blue-500 transition text-xl">
